@@ -1,0 +1,107 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 30
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lintOptions{
+        // 设置为 true，则当 Lint 发现错误时停止 Gradle 构建
+        abortOnError true
+    }
+
+    applicationVariants.all { variant ->
+        if (variant.buildType.name != "debug") {
+            variant.packageApplicationProvider.get().outputDirectory = rootProject.file("/apk")
+        }
+        variant.outputs.forEach {
+            it.apkData.outputFileName = "BaoNews_" +
+                    variant.versionName + "_" +
+                    defaultConfig.versionCode + "_" +
+                    variant.buildType.name +
+                    ".apk"
+        }
+    }
+
+    signingConfigs {
+        debug {
+            keyAlias 'baonews'
+            keyPassword 'gut123456'
+            storeFile file(project.rootDir.absolutePath + "/baonews.jks")
+            storePassword 'gut123456'
+        }
+        release {
+            keyAlias 'baonews'
+            keyPassword 'gut123456'
+            storeFile file(project.rootDir.absolutePath + "/baonews.jks")
+            storePassword 'gut123456'
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.gut.baonews"
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0.0"
+        multiDexEnabled true
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            zipAlignEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            zipAlignEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+    buildToolsVersion '29.0.2'
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.2'
+
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.6'
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+    implementation 'com.jakewharton:butterknife:10.2.3'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
+
+    // rxlifecycle解决RxJava内存泄漏
+    implementation 'com.trello.rxlifecycle3:rxlifecycle-components:3.1.0'
+
+    // 权限管理
+    implementation 'com.github.tbruyelle:rxpermissions:0.12'
+}
